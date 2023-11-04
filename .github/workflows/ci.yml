@@ -22,18 +22,6 @@ jobs:
         ports:
           - 6643:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      redis:
-        image: redis
-        ports:
-          - 6640:6379
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
-      rabbitmq:
-        image: "rabbitmq:3-management"
-        ports:
-          - 6641:5672
-        env:
-          RABBITMQ_DEFAULT_USER: ktlib
-          RABBITMQ_DEFAULT_PASS: local
 
     steps:
       - uses: actions/checkout@v4
