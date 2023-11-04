@@ -1,0 +1,11 @@
+instances:
+  org.ktlib.entities.EntityInitializer: org.ktlib.db.ktorm.TestEntityInitializer
+
+db:
+  type: Postgres
+  driver: org.postgresql.Driver
+  username: ktlib
+  password: local
+  jdbcUrl: jdbc:postgresql://localhost:6643/ktlib
+  ktorm:
+    entityClass: org.ktlib.entities.ktorm.SomethingEntity
