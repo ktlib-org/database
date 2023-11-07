@@ -32,14 +32,14 @@ dependencies {
 
     compileOnly(gradleApi())
 
-    implementation("com.github.ktlib-org:core:0.1.14")
+    implementation("com.github.ktlib-org:core:0.2.0")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.flywaydb:flyway-core:9.16.0")
     implementation("org.postgresql:postgresql:42.5.4")
     implementation("com.github.f4b6a3:uuid-creator:5.3.5")
-    
+
     compileOnly("org.ktorm:ktorm-core:$ktormVersion")
     compileOnly("org.ktorm:ktorm-jackson:$ktormVersion")
     compileOnly("org.ktorm:ktorm-support-postgresql:$ktormVersion")
