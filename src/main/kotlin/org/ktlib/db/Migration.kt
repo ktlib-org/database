@@ -1,6 +1,7 @@
 package org.ktlib.db
 
 import org.flywaydb.core.Flyway
+import org.ktlib.BootstrapRunner
 import org.ktlib.configList
 import java.io.File
 import java.time.LocalDateTime
@@ -75,6 +76,7 @@ object Migration {
     }
 
     fun run() {
+        BootstrapRunner.init()
         val migrationsPaths: List<String> =
             configList("db.migration.paths", listOf("migration", "adapters/db/migration"))
         Flyway.configure()
