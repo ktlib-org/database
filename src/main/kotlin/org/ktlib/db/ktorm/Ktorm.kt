@@ -79,9 +79,9 @@ object Ktorm : Init() {
         Instances.registerFactory(EntityCreator::class) { KtormEntityCreator }
     }
 
-    fun registerEntityTables(vararg stores: EntityTable<*, *>) = registerEntityTables(stores.toList())
+    fun registerEntityTables(vararg stores: Table<*, *>) = registerEntityTables(stores.toList())
 
-    fun registerEntityTables(stores: List<EntityTable<*, *>>) = stores.forEach { table ->
+    fun registerEntityTables(stores: List<Table<*, *>>) = stores.forEach { table ->
         if (table.entityClass != null) {
             Instances.registerFactory(table.entityType, KtormTypeFactory(table.entityClass!!))
             Instances.registerFactory(table.entityStoreType) { table }

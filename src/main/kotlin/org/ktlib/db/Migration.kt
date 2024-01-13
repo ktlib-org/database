@@ -2,7 +2,6 @@ package org.ktlib.db
 
 import org.flywaydb.core.Flyway
 import org.ktlib.configList
-import org.ktlib.entities.EntityInitializer
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -76,7 +75,6 @@ object Migration {
     }
 
     fun run() {
-        EntityInitializer.init()
         val migrationsPaths: List<String> =
             configList("db.migration.paths", listOf("migration", "adapters/db/migration"))
         Flyway.configure()

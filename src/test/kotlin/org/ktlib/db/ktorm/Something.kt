@@ -1,8 +1,8 @@
 package org.ktlib.db.ktorm
 
 import org.ktlib.entities.Entity
-import org.ktlib.entities.EntityStore
 import org.ktlib.entities.Factory
+import org.ktlib.entities.Repository
 import org.ktlib.entities.Validation.field
 import org.ktlib.entities.Validation.notBlank
 import org.ktlib.entities.Validation.validate
@@ -44,9 +44,9 @@ data class SomethingInfo(
     var long: Long?
 )
 
-object Somethings : SomethingStore by lookup()
+object Somethings : SomethingRepo by lookup()
 
-interface SomethingStore : EntityStore<Something> {
+interface SomethingRepo : Repository<Something> {
     fun create(name: String): Something
 }
 

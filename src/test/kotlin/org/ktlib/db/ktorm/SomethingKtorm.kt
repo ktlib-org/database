@@ -9,9 +9,9 @@ interface SomethingKtorm : EntityKtorm<SomethingKtorm>, Something
 abstract class IntermediateTable<E : EntityKtorm<E>, T : Entity>(
     tableName: String,
     alias: String? = null
-) : org.ktlib.db.ktorm.EntityTable<E, T>(tableName, alias)
+) : org.ktlib.db.ktorm.Table<E, T>(tableName, alias)
 
-object SomethingTable : IntermediateTable<SomethingKtorm, Something>("something"), SomethingStore {
+object SomethingTable : IntermediateTable<SomethingKtorm, Something>("something"), SomethingRepo {
     val name = varchar("name").bindTo { it.name }
     val value = varchar("value").bindTo { it.value }
     val enabled = boolean("enabled").bindTo { it.enabled }

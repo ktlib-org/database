@@ -1,23 +1,26 @@
 package org.ktlib.db.ktorm
 
 import org.ktlib.db.Mode
-import org.ktlib.entities.EntityStore
+import org.ktlib.entities.Repository
 import org.ktlib.entities.ids
 import org.ktlib.newUUID7
 import org.ktlib.now
 import org.ktlib.typeArguments
 import org.ktorm.dsl.*
 import org.ktorm.entity.*
-import org.ktorm.schema.*
+import org.ktorm.schema.BaseTable
+import org.ktorm.schema.ColumnDeclaring
+import org.ktorm.schema.datetime
+import org.ktorm.schema.uuid
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.jvmErasure
 
-abstract class EntityTable<E : EntityKtorm<E>, T : org.ktlib.entities.Entity>(
+abstract class Table<E : EntityKtorm<E>, T : org.ktlib.entities.Entity>(
     tableName: String,
     alias: String? = null
-) : Table<E>(tableName = tableName, alias = alias), EntityStore<T> {
+) : org.ktorm.schema.Table<E>(tableName = tableName, alias = alias), Repository<T> {
     val id = uuid("id").primaryKey().bindTo { it.id }
     val createdAt = datetime("created_at").bindTo { it.createdAt }
     val updatedAt = datetime("updated_at").bindTo { it.updatedAt }
@@ -26,18 +29,18 @@ abstract class EntityTable<E : EntityKtorm<E>, T : org.ktlib.entities.Entity>(
 
     val entityType: KClass<T>
         @Suppress("UNCHECKED_CAST")
-        get() = typeArguments(EntityTable::class)[1] as KClass<T>
+        get() = typeArguments(Table::class)[1] as KClass<T>
 
-    open val entityStoreType: KClass<EntityStore<T>>
+    open val entityStoreType: KClass<Repository<T>>
         get() {
             val found = this::class.supertypes.find {
-                it.jvmErasure.isSubclassOf(EntityStore::class) && it.arguments.isEmpty()
+                it.jvmErasure.isSubclassOf(Repository::class) && it.arguments.isEmpty()
             }
 
             @Suppress("UNCHECKED_CAST")
             when (found) {
-                null -> throw IllegalStateException("Could not automatically determine the EntityStore type for ${this::class}, you'll need to specify it by overriding entityStoreType")
-                else -> return found.jvmErasure as KClass<EntityStore<T>>
+                null -> throw IllegalStateException("Could not automatically determine the Repository type for ${this::class}, you'll need to specify it by overriding entityStoreType")
+                else -> return found.jvmErasure as KClass<Repository<T>>
             }
         }
 
@@ -89,11 +92,11 @@ abstract class EntityTable<E : EntityKtorm<E>, T : org.ktlib.entities.Entity>(
     override fun all() = findAll() as List<T>
 }
 
-fun <E : Entity<E>> Table<E>.addEntity(entity: E): Int {
+fun <E : Entity<E>> org.ktorm.schema.Table<E>.addEntity(entity: E): Int {
     return Ktorm.database(Mode.ReadWrite).sequenceOf(this).add(entity)
 }
 
-fun <E : Entity<E>> Table<E>.updateEntity(entity: E): Int {
+fun <E : Entity<E>> org.ktorm.schema.Table<E>.updateEntity(entity: E): Int {
     return Ktorm.database(Mode.ReadWrite).sequenceOf(this).update(entity)
 }
 

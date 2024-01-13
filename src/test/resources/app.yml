@@ -1,5 +1,4 @@
-instances:
-  org.ktlib.entities.EntityInitializer: org.ktlib.db.ktorm.TestEntityInitializer
+bootstrap: org.ktlib.db.ktorm.Bootstrap
 
 db:
   type: Postgres
