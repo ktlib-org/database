@@ -49,11 +49,11 @@ object Ktorm : Init() {
         }
     }
 
-    class KtormTypeFactory(private val type: KClass<*>) : TypeFactory {
-        override fun create(): Any {
+    fun createKtormTypeFactory(type: KClass<*>): TypeFactory {
+        return {
             val entity = Entity.create(type)
             entity["id"] = UuidCreator.getTimeOrderedEpoch()
-            return entity
+            entity
         }
     }
 
@@ -83,7 +83,7 @@ object Ktorm : Init() {
 
     fun registerEntityTables(stores: List<Table<*, *>>) = stores.forEach { table ->
         if (table.entityClass != null) {
-            Instances.registerFactory(table.entityType, KtormTypeFactory(table.entityClass!!))
+            Instances.registerFactory(table.entityType, createKtormTypeFactory(table.entityClass!!))
             Instances.registerFactory(table.entityStoreType) { table }
         }
     }
