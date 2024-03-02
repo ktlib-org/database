@@ -32,7 +32,7 @@ dependencies {
 
     compileOnly(gradleApi())
 
-    implementation("com.github.ktlib-org:core:0.4.1")
+    implementation("com.github.ktlib-org:core:0.5.1")
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     implementation("com.zaxxer:HikariCP:5.0.1")
