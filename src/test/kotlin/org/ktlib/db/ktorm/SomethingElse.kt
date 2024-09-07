@@ -5,7 +5,7 @@ import org.ktlib.entities.Validation.field
 import org.ktlib.entities.Validation.notBlank
 import org.ktlib.entities.Validation.notNull
 import org.ktlib.entities.Validation.validate
-import org.ktlib.lookup
+import org.ktlib.lookupInstance
 import java.util.*
 
 interface SomethingElse : Entity {
@@ -45,6 +45,6 @@ fun List<SomethingElse>.preloadSomethings() = preloadLazyList(
     { Somethings.findByIds(map { it.somethingId }) },
     { one, many -> many.filter { it.id == one.somethingId } })
 
-object SomethingElses : SomethingElseRepo by lookup()
+object SomethingElses : SomethingElseRepo by lookupInstance()
 
 interface SomethingElseRepo : Repository<SomethingElse>

@@ -1,6 +1,7 @@
 package org.ktlib.db.ktorm
 
 import com.github.f4b6a3.uuid.UuidCreator
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.ktlib.Init
 import org.ktlib.Instances
 import org.ktlib.TypeFactory
@@ -19,6 +20,7 @@ import kotlin.reflect.KClass
 typealias KtormDatabase = org.ktorm.database.Database
 
 object Ktorm : Init() {
+    private val logger = KotlinLogging.logger {}
     private val reads: List<KtormDatabase>
     private val readWrite: KtormDatabase
     private var readIndex = 0
@@ -59,6 +61,7 @@ object Ktorm : Init() {
 
     object KtormEntityCreator : EntityCreator {
         override fun <T : Any> create(type: KClass<T>): T {
+            logger.info { "Create entity ${type.simpleName}" }
             return Instances.instance(type)
         }
     }
@@ -82,9 +85,12 @@ object Ktorm : Init() {
     fun registerEntityTables(vararg stores: Table<*, *>) = registerEntityTables(stores.toList())
 
     fun registerEntityTables(stores: List<Table<*, *>>) = stores.forEach { table ->
+        logger.debug { "Registering Entity table ${table::class.qualifiedName}" }
         if (table.entityClass != null) {
             Instances.registerFactory(table.entityType, createKtormTypeFactory(table.entityClass!!))
             Instances.registerFactory(table.entityStoreType) { table }
+        } else {
+            logger.warn { "Could not register Entity table ${table::class.qualifiedName} because 'entityClass' was null" }
         }
     }
 

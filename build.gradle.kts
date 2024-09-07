@@ -21,9 +21,8 @@ repositories {
 plugins {
     `java-library`
     `maven-publish`
+    kotlin("jvm") version "2.0.20"
 }
-
-apply(plugin = "kotlin")
 
 dependencies {
     val kotlinVersion: String by project
@@ -32,13 +31,14 @@ dependencies {
 
     compileOnly(gradleApi())
 
-    implementation("com.github.ktlib-org:core:0.5.1")
-    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+    implementation("com.github.ktlib-org:core:0.6.14")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    implementation("org.flywaydb:flyway-core:9.16.0")
-    implementation("org.postgresql:postgresql:42.5.4")
-    implementation("com.github.f4b6a3:uuid-creator:5.3.5")
+    implementation("org.flywaydb:flyway-core:10.17.3")
+    implementation("org.flywaydb:flyway-database-postgresql:10.17.3")
+    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("com.github.f4b6a3:uuid-creator:6.0.0")
 
     compileOnly("org.ktorm:ktorm-core:$ktormVersion")
     compileOnly("org.ktorm:ktorm-jackson:$ktormVersion")
@@ -51,13 +51,11 @@ dependencies {
     testImplementation("org.ktorm:ktorm-support-mysql:$ktormVersion")
     testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.mockk:mockk:1.13.4")
+    testImplementation("io.mockk:mockk:1.13.12")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+kotlin {
+    jvmToolchain(17)
 }
 
 val test by tasks.getting(Test::class) {
