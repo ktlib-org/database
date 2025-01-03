@@ -2,9 +2,8 @@ package org.ktlib.db
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import com.zaxxer.hikari.metrics.IMetricsTracker
-import com.zaxxer.hikari.metrics.MetricsTrackerFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.opentelemetry.instrumentation.hikaricp.v3_0.HikariTelemetry
 import org.ktlib.*
 import org.ktlib.entities.TransactionManager
 import org.ktlib.trace.Trace
@@ -32,10 +31,10 @@ object Database : Init() {
     val readWrite: DataSource
     private var readIndex = 0
 
-    fun <T> useConnection(mode: Mode, block: (Connection) -> T) = when(mode) {
+    fun <T> useConnection(mode: Mode, block: (Connection) -> T) = when (mode) {
         Mode.ReadWrite -> {
             val manager = Instances.instance(TransactionManager::class)
-            if(manager is DatabaseTransactionManager) {
+            if (manager is DatabaseTransactionManager) {
                 manager.runInTransaction {
                     block(manager.connection)
                 }
@@ -43,6 +42,7 @@ object Database : Init() {
                 dataSource(mode).connection.use(block)
             }
         }
+
         Mode.ReadOnly -> dataSource(mode).connection.use(block)
     }
 
@@ -134,13 +134,7 @@ object Database : Init() {
                 driverClassName = driver
                 username = config("db.username")
                 password = config("db.password")
-                metricsTrackerFactory = MetricsTrackerFactory { _, _ ->
-                    object : IMetricsTracker {
-                        override fun recordConnectionUsageMillis(elapsedBorrowedMillis: Long) {
-                            Trace.addDbTime(elapsedBorrowedMillis)
-                        }
-                    }
-                }
+                metricsTrackerFactory = HikariTelemetry.create(Trace.openTelemetry).createMetricsTrackerFactory()
                 HikariDataSource(this)
             }
         }
@@ -293,7 +287,7 @@ internal object DatabaseTransactionManagerImpl : DatabaseTransactionManager {
     }
 
     override fun startTransaction() {
-        if(transactionHolder.get() == null || transactionHolder.get()?.connection?.isClosed == true) {
+        if (transactionHolder.get() == null || transactionHolder.get()?.connection?.isClosed == true) {
             transactionHolder.set(DatabaseTransaction())
         }
     }
@@ -303,7 +297,7 @@ internal object DatabaseTransactionManagerImpl : DatabaseTransactionManager {
         try {
             startTransaction()
             val result = func()
-            if(!alreadyStarted) {
+            if (!alreadyStarted) {
                 commit()
             }
             return result
@@ -311,7 +305,7 @@ internal object DatabaseTransactionManagerImpl : DatabaseTransactionManager {
             rollback()
             throw t
         } finally {
-            if(!alreadyStarted) {
+            if (!alreadyStarted) {
                 close()
             }
         }
@@ -327,11 +321,11 @@ internal object DatabaseTransactionManagerImpl : DatabaseTransactionManager {
             originalIsolation = conn.transactionIsolation
             originalAutoCommit = conn.autoCommit
 
-            if(originalIsolation != Connection.TRANSACTION_READ_COMMITTED) {
+            if (originalIsolation != Connection.TRANSACTION_READ_COMMITTED) {
                 conn.transactionIsolation = Connection.TRANSACTION_READ_COMMITTED
             }
 
-            if(originalAutoCommit) {
+            if (originalAutoCommit) {
                 conn.autoCommit = false
             }
 
@@ -341,27 +335,27 @@ internal object DatabaseTransactionManagerImpl : DatabaseTransactionManager {
         val connection: Connection by lazyConnection
 
         fun commit() {
-            if(lazyConnection.isInitialized()) {
+            if (lazyConnection.isInitialized()) {
                 connection.commit()
             }
         }
 
         fun rollback() {
-            if(lazyConnection.isInitialized()) {
+            if (lazyConnection.isInitialized()) {
                 connection.rollback()
             }
         }
 
         fun close() {
-            if(lazyConnection.isInitialized() && !connection.isClosed) {
+            if (lazyConnection.isInitialized() && !connection.isClosed) {
                 try {
-                    if(connection.transactionIsolation == originalIsolation) {
+                    if (connection.transactionIsolation == originalIsolation) {
                         connection.transactionIsolation = originalIsolation
                     }
-                    if(connection.autoCommit != originalAutoCommit) {
+                    if (connection.autoCommit != originalAutoCommit) {
                         connection.autoCommit = originalAutoCommit
                     }
-                } catch(_: Throwable){
+                } catch (_: Throwable) {
                 } finally {
                     connection.close()
                 }

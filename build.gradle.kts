@@ -31,10 +31,11 @@ dependencies {
 
     compileOnly(gradleApi())
 
-    implementation("com.github.ktlib-org:core:0.6.15")
+    implementation("com.github.ktlib-org:core:0.7.2")
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     implementation("com.zaxxer:HikariCP:5.0.1")
+    implementation("io.opentelemetry.instrumentation:opentelemetry-hikaricp-3.0:2.11.0-alpha")
     implementation("org.flywaydb:flyway-core:10.17.3")
     implementation("org.flywaydb:flyway-database-postgresql:10.17.3")
     implementation("org.postgresql:postgresql:42.7.4")
@@ -55,7 +56,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 val test by tasks.getting(Test::class) {
